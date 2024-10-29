@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  description: msgsvc api
+  title: msgsvc
+  version: 1.0.0
+servers:
+- url: https://www.example.com/api/open/v1
+tags:
+- description: Operations about message
+  name: message
+- description: Operations about group
+  name: group
+paths:
+  /message:
+    post:
+      description: This API allows user to send message
+      operationId: CreateMessage
+      parameters:
+      - description: Access token
+        explode: false
+        in: header
+        name: Authorization
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessage'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMessage_201_response'
+          description: Message sent successfully
+        "400":
+          description: Bad request. Message must be a string and pass all validation.
+        "401":
+          description: Unauthorized. User credentials are not valid.
+        "500":
+          description: Internal Server Error.
+      summary: Create message
+      tags:
+      - message
+  /upload:
+    post:
+      description: This API allows user to upload message data
+      operationId: UploadData
+      parameters:
+      - description: Access token
+        explode: false
+        in: header
+        name: Authorization
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              format: binary
+              type: string
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadData_200_response'
+          description: Successful operation
+      summary: Upload message data if necessary
+      tags:
+      - message
+  /download:
+    get:
+      description: This API allows user to download message data
+      operationId: DownloadData
+      parameters:
+      - description: Access token
+        explode: false
+        in: header
+        name: Authorization
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: header
+        name: Message-Id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                format: binary
+                type: string
+          description: Successful operation
+        "400":
+          description: Bad request.
+        "401":
+          description: Unauthorized. User credentials are not valid.
+        "500":
+          description: Internal Server Error.
+      summary: Download message data
+      tags:
+      - message
+components:
+  parameters:
+    Authorization:
+      description: Access token
+      explode: false
+      in: header
+      name: Authorization
+      required: true
+      schema:
+        format: uuid
+        type: string
+      style: simple
+    MessageId:
+      explode: false
+      in: header
+      name: Message-Id
+      required: true
+      schema:
+        format: uuid
+        type: string
+      style: simple
+  schemas:
+    CreateMessage:
+      example:
+        toUser: toUser
+        fileName: fileName
+        dataId: dataId
+        text: text
+        toGroup: toGroup
+      properties:
+        toUser:
+          description: The user ID to whom the message is sent
+          type: string
+        toGroup:
+          description: The group ID to whom the message is sent
+          type: string
+        text:
+          description: The message text
+          type: string
+        dataId:
+          description: The data ID
+          type: string
+        fileName:
+          description: The file name
+          type: string
+      type: object
+    CreateMessage_201_response:
+      example:
+        messageId: messageId
+      properties:
+        messageId:
+          description: The message ID
+          type: string
+      type: object
+    UploadData_200_response:
+      example:
+        dataId: dataId
+      properties:
+        dataId:
+          description: The data ID
+          type: string
+      type: object
